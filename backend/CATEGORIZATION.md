@@ -38,10 +38,10 @@ The engine learns from two sources:
 
 Settings in `app/core/config.py`:
 
-```python
+\`\`\`python
 MIN_TRAINING_SAMPLES: int = 3  # Minimum transactions per category
 SIMILARITY_THRESHOLD: float = 0.7  # Confidence threshold (0-1)
-```
+\`\`\`
 
 - **MIN_TRAINING_SAMPLES**: Minimum number of transactions needed per category before ML training
 - **SIMILARITY_THRESHOLD**: Minimum confidence score to accept a prediction (lower = more predictions, higher = more conservative)
@@ -50,9 +50,9 @@ SIMILARITY_THRESHOLD: float = 0.7  # Confidence threshold (0-1)
 
 ### Train the Model
 
-```bash
+\`\`\`bash
 POST /api/categorization/train
-```
+\`\`\`
 
 Trains the ML model on all existing categorized transactions. Should be called:
 - After importing historical data
@@ -60,12 +60,12 @@ Trains the ML model on all existing categorized transactions. Should be called:
 - When accuracy seems low
 
 Example:
-```bash
+\`\`\`bash
 curl -X POST http://localhost:8000/api/categorization/train
-```
+\`\`\`
 
 Response:
-```json
+\`\`\`json
 {
   "success": true,
   "message": "ML model trained successfully",
@@ -76,23 +76,23 @@ Response:
     "min_samples": 3
   }
 }
-```
+\`\`\`
 
 ### Get Statistics
 
-```bash
+\`\`\`bash
 GET /api/categorization/stats
-```
+\`\`\`
 
 Returns current categorization system statistics.
 
 Example:
-```bash
+\`\`\`bash
 curl http://localhost:8000/api/categorization/stats
-```
+\`\`\`
 
 Response:
-```json
+\`\`\`json
 {
   "rule_based": {
     "total_rules": 45,
@@ -107,13 +107,13 @@ Response:
   "user_corrections": 23,
   "threshold": 0.7
 }
-```
+\`\`\`
 
 ### Test Prediction
 
-```bash
+\`\`\`bash
 POST /api/categorization/predict?description=coffee%20at%20starbucks
-```
+\`\`\`
 
 Tests category prediction for a description.
 
@@ -221,7 +221,7 @@ Descriptions are normalized:
 
 ## Example Workflow
 
-```bash
+\`\`\`bash
 # 1. Create some transactions
 curl -X POST http://localhost:8000/api/transactions/ \
   -H "Content-Type: application/json" \
@@ -245,7 +245,7 @@ curl -X POST "http://localhost:8000/api/categorization/predict?description=coffe
 
 # 6. Send transaction via Telegram (auto-categorized)
 # Send message to bot: "5 coffee"
-```
+\`\`\`
 
 ## Performance
 

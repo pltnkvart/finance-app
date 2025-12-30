@@ -14,9 +14,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY backend/ .
 
-RUN chmod +x scripts/run_migrations.sh
+RUN mkdir -p scripts && chmod +x scripts/run_migrations.sh
 
 # Create directory for logs
 RUN mkdir -p /app/logs
 
-CMD ["sh", "-c", "./scripts/run_migrations.sh && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"]
+CMD ["sh", "-c", "bash ./scripts/run_migrations.sh && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"]

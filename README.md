@@ -45,23 +45,23 @@ A full-stack financial tracking application with Telegram bot integration for au
    - See `backend/TELEGRAM_SETUP.md` for detailed instructions
 
 3. Copy `.env.example` to `.env` and fill in your values:
-```bash
+\`\`\`bash
 cp .env.example .env
-```
+\`\`\`
 
 Edit `.env`:
-```
+\`\`\`
 DATABASE_URL=postgresql://fintrack_user:fintrack_pass@localhost:5432/fintrack
 TELEGRAM_BOT_TOKEN=your_telegram_bot_token_here
 SECRET_KEY=your_secret_key_here
 ENVIRONMENT=development
 NEXT_PUBLIC_API_URL=http://localhost:8000
-```
+\`\`\`
 
 4. Start all services with Docker:
-```bash
+\`\`\`bash
 docker-compose up -d
-```
+\`\`\`
 
 This will start:
 - PostgreSQL database
@@ -69,15 +69,15 @@ This will start:
 - Telegram bot (polling mode)
 
 5. Verify services are running:
-```bash
+\`\`\`bash
 docker-compose ps
-```
+\`\`\`
 
 6. Start the Next.js frontend:
-```bash
+\`\`\`bash
 npm install
 npm run dev
-```
+\`\`\`
 
 7. Access the application:
    - Frontend: http://localhost:3000
@@ -93,7 +93,7 @@ npm run dev
 
 ## Project Structure
 
-```
+\`\`\`
 ├── backend/              # FastAPI backend
 │   ├── app/
 │   │   ├── api/         # API endpoints
@@ -111,13 +111,13 @@ npm run dev
 │   └── lib/            # Utilities
 ├── docker-compose.yml
 └── README.md
-```
+\`\`\`
 
 ## Development Commands
 
 ### Backend
 
-```bash
+\`\`\`bash
 # Run migrations
 docker-compose exec backend alembic upgrade head
 
@@ -130,11 +130,11 @@ docker-compose logs telegram-bot
 
 # Run tests
 docker-compose exec backend pytest
-```
+\`\`\`
 
 ### Frontend
 
-```bash
+\`\`\`bash
 # Start development server
 npm run dev
 
@@ -143,7 +143,7 @@ npm run build
 
 # Start production server
 npm start
-```
+\`\`\`
 
 ## Bot Usage
 

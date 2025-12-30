@@ -14,9 +14,9 @@
    - Choose a username (must end in 'bot', e.g., "fintrack_expenses_bot")
 4. BotFather will give you a token like: `123456789:ABCdefGHIjklMNOpqrsTUVwxyz`
 5. Copy this token to your `.env` file:
-   ```
+   \`\`\`
    TELEGRAM_BOT_TOKEN=123456789:ABCdefGHIjklMNOpqrsTUVwxyz
-   ```
+   \`\`\`
 
 ## Running the Bot
 
@@ -24,14 +24,14 @@
 
 Run the bot as a standalone service:
 
-```bash
+\`\`\`bash
 # Using Docker Compose
 docker-compose up telegram-bot
 
 # Or run directly
 cd backend
 python run_bot.py
-```
+\`\`\`
 
 The bot will continuously poll Telegram for new messages.
 
@@ -51,15 +51,15 @@ Set up a webhook to receive messages:
 1. Deploy your FastAPI server with HTTPS (Telegram requires HTTPS)
 2. Set the webhook URL:
 
-```bash
+\`\`\`bash
 curl -X POST "https://api.telegram.org/bot<YOUR_BOT_TOKEN>/setWebhook?url=https://yourdomain.com/api/telegram/webhook"
-```
+\`\`\`
 
 3. Verify webhook is set:
 
-```bash
+\`\`\`bash
 curl "https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getWebhookInfo"
-```
+\`\`\`
 
 **Pros:**
 - Instant message delivery
@@ -106,9 +106,9 @@ Examples:
 
 1. Check that `TELEGRAM_BOT_TOKEN` is set correctly in `.env`
 2. Verify the bot is running:
-   ```bash
+   \`\`\`bash
    docker-compose logs telegram-bot
-   ```
+   \`\`\`
 3. Make sure the database is running and migrations have been applied
 
 ### Messages not being categorized
@@ -119,13 +119,13 @@ The categorization engine learns from your corrections. Initially, most transact
 
 1. Ensure your server is accessible via HTTPS
 2. Check webhook status:
-   ```bash
+   \`\`\`bash
    curl "https://api.telegram.org/bot<YOUR_TOKEN>/getWebhookInfo"
-   ```
+   \`\`\`
 3. Remove webhook and switch to polling:
-   ```bash
+   \`\`\`bash
    curl -X POST "https://api.telegram.org/bot<YOUR_TOKEN>/deleteWebhook"
-   ```
+   \`\`\`
 
 ## Security Best Practices
 
