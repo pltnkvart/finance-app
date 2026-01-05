@@ -16,6 +16,9 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
 
   backend:
     build:
@@ -33,6 +36,10 @@ services:
     volumes:
       - ./backend:/app
     command: sh -c "./scripts/run_migrations.sh && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    network_mode: bridge
 
   telegram-bot:
     build:
@@ -47,6 +54,9 @@ services:
     volumes:
       - ./backend:/app
     restart: unless-stopped
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
 
 volumes:
   postgres_data:

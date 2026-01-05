@@ -1,177 +1,210 @@
-# FinTrack - Financial Tracking Application
+# FinTrack - Приложение для учета финансов
 
-A full-stack financial tracking application with Telegram bot integration for automatic transaction parsing and categorization.
+Полнофункциональное приложение для отслеживания финансов с интеграцией Telegram-бота для автоматического парсинга и категоризации транзакций.
 
-## Features
+## Возможности
 
-- Telegram bot for easy transaction input via messages
-- Automatic transaction parsing from natural language
-- Smart categorization with machine learning
-- Analytics dashboard with visualizations
-- CSV export functionality
-- RESTful API backend
+- Telegram-бот для простого ввода транзакций через сообщения
+- Автоматический парсинг транзакций из естественного языка
+- Умная категоризация с машинным обучением
+- Панель аналитики с визуализацией
+- Экспорт в CSV
+- Управление счетами и вкладами
+- Расчет общего баланса
+- RESTful API бэкенд
 
-## Tech Stack
+## Технологии
 
-### Backend
-- FastAPI (Python web framework)
-- PostgreSQL (Database)
-- SQLAlchemy + Alembic (ORM + Migrations)
-- python-telegram-bot (Telegram integration)
-- scikit-learn (ML categorization)
+### Бэкенд
+- FastAPI (Python веб-фреймворк)
+- PostgreSQL (База данных)
+- SQLAlchemy + Alembic (ORM + Миграции)
+- python-telegram-bot (Интеграция с Telegram)
+- scikit-learn (ML категоризация)
 
-### Frontend
-- Next.js 16 (React framework)
-- Redux Toolkit + RTK Query (State management)
-- Tailwind CSS (Styling)
-- shadcn/ui (UI components)
+### Фронтенд
+- Next.js 16 (React фреймворк)
+- Tailwind CSS (Стилизация)
+- shadcn/ui (UI компоненты)
 
-## Getting Started
+## Начало работы
 
-### Prerequisites
-- Docker and Docker Compose
-- Node.js 18+ (for frontend development)
-- Python 3.11+ (for backend development)
-- Telegram account (for bot setup)
+### Требования
+- Docker и Docker Compose
+- Node.js 18+ (для разработки фронтенда)
+- Python 3.11+ (для разработки бэкенда)
+- Telegram аккаунт (для настройки бота)
 
-### Setup
+### Установка
 
-1. Clone the repository
+1. Клонируйте репозиторий
 
-2. Create a Telegram bot:
-   - Open Telegram and search for @BotFather
-   - Send `/newbot` and follow the prompts
-   - Copy your bot token
-   - See `backend/TELEGRAM_SETUP.md` for detailed instructions
+2. Создайте Telegram-бота:
+   - Откройте Telegram и найдите @BotFather
+   - Отправьте `/newbot` и следуйте инструкциям
+   - Скопируйте токен бота
+   - См. `backend/TELEGRAM_SETUP.md` для подробных инструкций
 
-3. Copy `.env.example` to `.env` and fill in your values:
-\`\`\`bash
+3. Скопируйте `.env.example` в `.env` и заполните значения:
+```bash
 cp .env.example .env
-\`\`\`
+```
 
-Edit `.env`:
-\`\`\`
+Отредактируйте `.env`:
+```
 DATABASE_URL=postgresql://fintrack_user:fintrack_pass@localhost:5432/fintrack
-TELEGRAM_BOT_TOKEN=your_telegram_bot_token_here
-SECRET_KEY=your_secret_key_here
+TELEGRAM_BOT_TOKEN=ваш_токен_telegram_бота
+SECRET_KEY=ваш_секретный_ключ
 ENVIRONMENT=development
 NEXT_PUBLIC_API_URL=http://localhost:8000
-\`\`\`
+```
 
-4. Start all services with Docker:
-\`\`\`bash
-docker-compose up -d
-\`\`\`
+4. Запустите все сервисы через Docker:
+```bash
+docker-compose up --build
+```
 
-This will start:
-- PostgreSQL database
-- FastAPI backend (with auto migrations)
-- Telegram bot (polling mode)
+⚠️ **Если возникает ошибка сети при сборке**, см. `TROUBLESHOOTING.md`
 
-5. Verify services are running:
-\`\`\`bash
+Это запустит:
+- PostgreSQL базу данных
+- FastAPI бэкенд (с автоматическими миграциями)
+- Telegram-бот (режим polling)
+
+5. Проверьте, что сервисы запущены:
+```bash
 docker-compose ps
-\`\`\`
+```
 
-6. Start the Next.js frontend:
-\`\`\`bash
+6. Запустите Next.js фронтенд:
+```bash
 npm install
 npm run dev
-\`\`\`
+```
 
-7. Access the application:
-   - Frontend: http://localhost:3000
-   - API docs: http://localhost:8000/docs
+7. Откройте приложение:
+   - Фронтенд: http://localhost:3000
+   - API документация: http://localhost:8000/docs
    - API: http://localhost:8000
 
-### Testing the Bot
+### Тестирование бота
 
-1. Open Telegram and search for your bot
-2. Send `/start` to initialize
-3. Try sending: `100 groceries`
-4. Check the dashboard to see your transaction
+1. Откройте Telegram и найдите вашего бота
+2. Отправьте `/start` для инициализации
+3. Попробуйте отправить: `100 продукты`
+4. Проверьте дашборд - там появится ваша транзакция
 
-## Project Structure
+## Структура проекта
 
-\`\`\`
-├── backend/              # FastAPI backend
+```
+├── backend/              # FastAPI бэкенд
 │   ├── app/
 │   │   ├── api/         # API endpoints
-│   │   ├── bot/         # Telegram bot
-│   │   ├── core/        # Core configuration
-│   │   ├── domain/      # Business logic
-│   │   ├── models/      # Database models
-│   │   └── schemas/     # Pydantic schemas
-│   ├── migrations/      # Alembic migrations
-│   ├── scripts/         # Utility scripts
+│   │   ├── bot/         # Telegram бот
+│   │   ├── core/        # Основная конфигурация
+│   │   ├── domain/      # Бизнес-логика
+│   │   ├── models/      # Модели базы данных
+│   │   └── schemas/     # Pydantic схемы
+│   ├── migrations/      # Alembic миграции
+│   ├── scripts/         # Утилиты
 │   └── requirements.txt
-├── app/                 # Next.js frontend
-│   ├── api/            # API route handlers
-│   ├── components/     # React components
-│   └── lib/            # Utilities
+├── app/                 # Next.js фронтенд
+│   ├── accounts/       # Страница счетов
+│   ├── analytics/      # Аналитика
+│   ├── export/         # Экспорт данных
+│   ├── transactions/   # Транзакции
+│   └── settings/       # Настройки
+├── components/          # React компоненты
 ├── docker-compose.yml
+├── TROUBLESHOOTING.md   # Решение проблем
 └── README.md
-\`\`\`
+```
 
-## Development Commands
+## Команды разработки
 
-### Backend
+### Бэкенд
 
-\`\`\`bash
-# Run migrations
+```bash
+# Запуск миграций
 docker-compose exec backend alembic upgrade head
 
-# Create new migration
-docker-compose exec backend alembic revision --autogenerate -m "description"
+# Создание новой миграции
+docker-compose exec backend alembic revision --autogenerate -m "описание"
 
-# View logs
+# Просмотр логов
 docker-compose logs backend
 docker-compose logs telegram-bot
 
-# Run tests
+# Запуск тестов
 docker-compose exec backend pytest
-\`\`\`
 
-### Frontend
+# Остановка сервисов
+docker-compose down
+```
 
-\`\`\`bash
-# Start development server
+### Фронтенд
+
+```bash
+# Запуск dev сервера
 npm run dev
 
-# Build for production
+# Сборка для продакшена
 npm run build
 
-# Start production server
+# Запуск продакшн сервера
 npm start
-\`\`\`
+```
 
-## Bot Usage
+## Использование бота
 
-### Commands
-- `/start` - Start the bot
-- `/help` - Show help message
-- `/stats` - View statistics
+### Команды
+- `/start` - Запустить бота
+- `/help` - Показать помощь
+- `/stats` - Посмотреть статистику
 
-### Transaction Formats
-- `100 groceries` - Amount + description
-- `coffee 5` - Description + amount
-- `100` - Just amount
+### Форматы транзакций
+- `100 продукты` - Сумма + описание
+- `кофе 5` - Описание + сумма
+- `100` - Только сумма
 
-## API Documentation
+## Документация API
 
-Once the backend is running, visit:
+После запуска бэкенда доступна по адресам:
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
 
-## Development Roadmap
+### Основные эндпоинты:
 
-- [x] Setup Project Structure & Docker
-- [x] Create Database Models & Migrations
-- [x] Build Core API Endpoints
-- [x] Implement Telegram Bot Parser
-- [ ] Build Categorization Engine
-- [ ] Create React Dashboard
+- `GET /api/transactions` - Список транзакций
+- `POST /api/transactions` - Создать транзакцию
+- `GET /api/accounts` - Список счетов
+- `POST /api/accounts` - Создать счет
+- `GET /api/deposits` - Список вкладов
+- `POST /api/deposits` - Создать вклад
+- `GET /api/statistics` - Статистика и общий баланс
+- `POST /api/export/csv` - Экспорт в CSV
 
-## License
+## Решение проблем
+
+Если при запуске возникают проблемы, см. `TROUBLESHOOTING.md`:
+- Ошибки сети при сборке Docker образа
+- Проблемы с DNS
+- Permission denied для скриптов
+- База данных не подключается
+- Порты заняты
+
+## План разработки
+
+- [x] Настройка структуры проекта и Docker
+- [x] Создание моделей базы данных и миграций
+- [x] Создание основных API endpoints
+- [x] Реализация Telegram бота
+- [x] Создание движка категоризации с ML
+- [x] Создание React дашборда
+- [x] Русификация интерфейса
+- [x] Добавление счетов и вкладов
+- [x] Общий баланс
+
+## Лицензия
 
 MIT
