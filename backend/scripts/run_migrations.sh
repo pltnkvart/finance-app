@@ -4,11 +4,18 @@ echo "======================================"
 echo "Running Database Migrations"
 echo "======================================"
 
-# Wait for postgres to be ready
 echo "Waiting for PostgreSQL to be ready..."
+MAX_RETRIES=30
+RETRY_COUNT=0
+
 until PGPASSWORD=fintrack_pass psql -h postgres -U fintrack_user -d fintrack -c '\q' 2>/dev/null; do
-  echo "PostgreSQL is unavailable - sleeping"
-  sleep 1
+  RETRY_COUNT=$((RETRY_COUNT + 1))
+  if [ $RETRY_COUNT -ge $MAX_RETRIES ]; then
+    echo "PostgreSQL did not become ready in time. Exiting..."
+    exit 1
+  fi
+  echo "PostgreSQL is unavailable - sleeping (попытка $RETRY_COUNT/$MAX_RETRIES)"
+  sleep 2
 done
 
 echo "PostgreSQL is ready!"

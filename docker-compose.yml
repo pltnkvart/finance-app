@@ -13,9 +13,10 @@ services:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U fintrack_user -d fintrack"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      interval: 3s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
     dns:
       - 8.8.8.8
       - 8.8.4.4
@@ -39,7 +40,7 @@ services:
     dns:
       - 8.8.8.8
       - 8.8.4.4
-    network_mode: bridge
+    restart: unless-stopped
 
   telegram-bot:
     build:
@@ -50,8 +51,10 @@ services:
     environment:
       DATABASE_URL: postgresql://fintrack_user:fintrack_pass@postgres:5432/fintrack
     depends_on:
-      - postgres
-      - backend
+      postgres:
+        condition: service_healthy
+      backend:
+        condition: service_started
     volumes:
       - ./backend:/app
     restart: unless-stopped
