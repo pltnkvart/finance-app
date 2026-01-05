@@ -41,34 +41,34 @@ class FinTrackBot:
     async def start_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handle /start command"""
         welcome_message = (
-            "Welcome to FinTrack Bot! 🎉\n\n"
-            "I help you track your expenses quickly and easily.\n\n"
-            "Just send me a message with the amount and description:\n"
-            "• '100 groceries'\n"
-            "• '50.5 coffee'\n"
-            "• 'lunch 25'\n\n"
-            "I'll automatically categorize your transactions and you can view them in the dashboard.\n\n"
-            "Use /help for more information."
+            "Добро пожаловать в FinTrack Bot! 🎉\n\n"
+            "Я помогу вам быстро и легко отслеживать ваши расходы.\n\n"
+            "Просто отправьте мне сообщение с суммой и описанием:\n"
+            "• '100 продукты'\n"
+            "• '50.5 кофе'\n"
+            "• 'обед 25'\n\n"
+            "Я автоматически категоризирую ваши транзакции, и вы сможете просматривать их в дашборде.\n\n"
+            "Используйте /help для получения дополнительной информации."
         )
         await update.message.reply_text(welcome_message)
     
     async def help_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handle /help command"""
         help_message = (
-            "📝 How to use FinTrack Bot:\n\n"
-            "Send a message with:\n"
-            "1. Amount (required)\n"
-            "2. Description (optional)\n\n"
-            "Examples:\n"
-            "• '100 groceries at supermarket'\n"
-            "• '25.50 uber ride'\n"
-            "• 'coffee 5'\n"
-            "• '100' (will be labeled as 'Transaction')\n\n"
-            "Commands:\n"
-            "/start - Start the bot\n"
-            "/help - Show this help message\n"
-            "/stats - View your transaction statistics\n\n"
-            "The bot will automatically categorize your transactions based on the description!"
+            "📝 Как использовать FinTrack Bot:\n\n"
+            "Отправьте сообщение с:\n"
+            "1. Сумма (обязательно)\n"
+            "2. Описание (опционально)\n\n"
+            "Примеры:\n"
+            "• '100 продукты в супермаркете'\n"
+            "• '25.50 такси убер'\n"
+            "• 'кофе 5'\n"
+            "• '100' (будет помечено как 'Транзакция')\n\n"
+            "Команды:\n"
+            "/start - Запустить бота\n"
+            "/help - Показать это справочное сообщение\n"
+            "/stats - Посмотреть статистику транзакций\n\n"
+            "Бот автоматически категоризирует ваши транзакции на основе описания!"
         )
         await update.message.reply_text(help_message)
     
@@ -81,10 +81,10 @@ class FinTrackBot:
             summary = service.get_summary()
             
             stats_message = (
-                f"📊 Your Statistics:\n\n"
-                f"Total Transactions: {summary['transaction_count']}\n"
-                f"Total Amount: ${summary['total_amount']:.2f}\n\n"
-                f"View detailed analytics in the dashboard!"
+                f"📊 Ваша статистика:\n\n"
+                f"Всего транзакций: {summary['transaction_count']}\n"
+                f"Общая сумма: {summary['total_amount']:.2f} ₽\n\n"
+                f"Просмотрите подробную аналитику в дашборде!"
             )
             await update.message.reply_text(stats_message)
         finally:
@@ -116,23 +116,23 @@ class FinTrackBot:
                 category_name = transaction.category.name if transaction and transaction.category else "Uncategorized"
                 
                 reply_message = (
-                    f"✅ Transaction saved!\n\n"
-                    f"Amount: ${response.parsed_data['amount']:.2f}\n"
-                    f"Description: {response.parsed_data['description']}\n"
-                    f"Category: {category_name}"
+                    f"✅ Транзакция сохранена!\n\n"
+                    f"Сумма: {response.parsed_data['amount']:.2f} ₽\n"
+                    f"Описание: {response.parsed_data['description']}\n"
+                    f"Категория: {category_name}"
                 )
                 await update.message.reply_text(reply_message)
             else:
                 await update.message.reply_text(
                     f"❌ {response.message}\n\n"
-                    f"Try formats like:\n"
-                    f"• '100 groceries'\n"
-                    f"• '50.5 coffee'"
+                    f"Попробуйте форматы:\n"
+                    f"• '100 продукты'\n"
+                    f"• '50.5 кофе'"
                 )
         except Exception as e:
             logger.error(f"Error processing message: {e}")
             await update.message.reply_text(
-                "❌ Sorry, there was an error processing your transaction. Please try again."
+                "❌ Извините, произошла ошибка при обработке вашей транзакции. Пожалуйста, попробуйте снова."
             )
         finally:
             db.close()

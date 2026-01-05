@@ -27,7 +27,7 @@ class TelegramService:
             if not parsed_data:
                 return TelegramMessageResponse(
                     success=False,
-                    message="Could not parse transaction from message. Please use format: '100 groceries' or '50.5 coffee'"
+                    message="Не удалось распознать транзакцию. Используйте формат: '100 продукты' или '50.5 кофе'"
                 )
             
             # Predict category
@@ -50,14 +50,14 @@ class TelegramService:
             return TelegramMessageResponse(
                 success=True,
                 transaction_id=transaction.id,
-                message=f"Transaction created: {parsed_data['amount']} for {parsed_data['description']}",
+                message=f"Транзакция создана: {parsed_data['amount']} ₽ за {parsed_data['description']}",
                 parsed_data=parsed_data
             )
             
         except Exception as e:
             return TelegramMessageResponse(
                 success=False,
-                message=f"Error creating transaction: {str(e)}"
+                message=f"Ошибка при создании транзакции: {str(e)}"
             )
     
     def _parse_message(self, text: str) -> Optional[Dict[str, Any]]:
@@ -87,7 +87,7 @@ class TelegramService:
         if match:
             return {
                 "amount": float(match.group(1)),
-                "description": "Transaction"
+                "description": "Транзакция"
             }
         
         return None
