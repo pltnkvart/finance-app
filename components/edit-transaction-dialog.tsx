@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { api } from "@/lib/api"
 
 interface Transaction {
   id: number
@@ -41,22 +42,16 @@ export function EditTransactionDialog({ transaction, categories, onClose, onUpda
     setLoading(true)
 
     try {
-      const response = await fetch(`http://localhost:8000/api/transactions/${transaction.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          amount: Number.parseFloat(amount),
-          description,
-          category_id: categoryId ? Number.parseInt(categoryId) : null,
-        }),
+      const updatedTransaction = await api.updateTransaction(transaction.id, {
+        amount: Number.parseFloat(amount),
+        description,
+        category_id: categoryId ? Number.parseInt(categoryId) : null,
       })
-
-      const updatedTransaction = await response.json()
       onUpdate(updatedTransaction)
       onClose()
     } catch (error) {
-      console.error("Failed to update transaction:", error)
-      alert("Failed to update transaction")
+      console.error("Ошибка обновления транзакции:", error)
+      alert("Не удалось обновить транзакцию")
     } finally {
       setLoading(false)
     }
@@ -66,13 +61,13 @@ export function EditTransactionDialog({ transaction, categories, onClose, onUpda
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit Transaction</DialogTitle>
-          <DialogDescription>Update transaction details and category</DialogDescription>
+          <DialogTitle>Редактировать транзакцию</DialogTitle>
+          <DialogDescription>Обновить детали и категорию транзакции</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="amount">Amount</Label>
+            <Label htmlFor="amount">Сумма</Label>
             <Input
               id="amount"
               type="number"
@@ -84,15 +79,15 @@ export function EditTransactionDialog({ transaction, categories, onClose, onUpda
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">Описание</Label>
             <Input id="description" value={description} onChange={(e) => setDescription(e.target.value)} required />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="category">Category</Label>
+            <Label htmlFor="category">Категория</Label>
             <Select value={categoryId} onValueChange={setCategoryId}>
               <SelectTrigger>
-                <SelectValue placeholder="Select category" />
+                <SelectValue placeholder="Выберите категорию" />
               </SelectTrigger>
               <SelectContent>
                 {categories.map((category) => (
@@ -106,10 +101,10 @@ export function EditTransactionDialog({ transaction, categories, onClose, onUpda
 
           <div className="flex justify-end gap-3">
             <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
+              Отмена
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? "Saving..." : "Save Changes"}
+              {loading ? "Сохранение..." : "Сохранить"}
             </Button>
           </div>
         </form>

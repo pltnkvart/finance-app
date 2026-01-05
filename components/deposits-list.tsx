@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { PiggyBank, Plus } from "lucide-react"
 import { CreateDepositDialog } from "@/components/create-deposit-dialog"
+import { api } from "@/lib/api"
 
 interface Deposit {
   id: number
@@ -38,8 +39,8 @@ export function DepositsList() {
   const [showCreateDialog, setShowCreateDialog] = useState(false)
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/deposits")
-      .then((res) => res.json())
+    api
+      .getDeposits()
       .then((data) => {
         setDeposits(data)
         setLoading(false)

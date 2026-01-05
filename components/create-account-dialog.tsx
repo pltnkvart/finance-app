@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { api } from "@/lib/api"
 
 interface CreateAccountDialogProps {
   open: boolean
@@ -26,19 +27,13 @@ export function CreateAccountDialog({ open, onOpenChange }: CreateAccountDialogP
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    const response = await fetch("http://localhost:8000/api/accounts", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...formData,
-        balance: Number.parseFloat(formData.balance),
-      }),
+    await api.createAccount({
+      ...formData,
+      balance: Number.parseFloat(formData.balance),
     })
 
-    if (response.ok) {
-      onOpenChange(false)
-      window.location.reload()
-    }
+    onOpenChange(false)
+    window.location.reload()
   }
 
   return (

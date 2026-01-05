@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { api } from "@/lib/api"
 
 interface CreateDepositDialogProps {
   open: boolean
@@ -32,32 +33,24 @@ export function CreateDepositDialog({ open, onOpenChange }: CreateDepositDialogP
 
   useEffect(() => {
     if (open) {
-      fetch("http://localhost:8000/api/accounts")
-        .then((res) => res.json())
-        .then((data) => setAccounts(data))
+      api.getAccounts().then((data) => setAccounts(data))
     }
   }, [open])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    const response = await fetch("http://localhost:8000/api/deposits", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        account_id: Number.parseInt(formData.account_id),
-        name: formData.name,
-        amount: Number.parseFloat(formData.amount),
-        interest_rate: Number.parseFloat(formData.interest_rate),
-        start_date: formData.start_date,
-        end_date: formData.end_date,
-      }),
+    await api.createDeposit({
+      account_id: Number.parseInt(formData.account_id),
+      name: formData.name,
+      amount: Number.parseFloat(formData.amount),
+      interest_rate: Number.parseFloat(formData.interest_rate),
+      start_date: formData.start_date,
+      end_date: formData.end_date,
     })
 
-    if (response.ok) {
-      onOpenChange(false)
-      window.location.reload()
-    }
+    onOpenChange(false)
+    window.location.reload()
   }
 
   return (
