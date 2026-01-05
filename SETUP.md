@@ -77,6 +77,22 @@ docker-compose down -v
 
 ## Troubleshooting
 
+### Environment Variables Not Loading
+
+If you see errors like `Field required for SECRET_KEY`:
+
+1. **Make sure .env file exists** in the project root (same level as docker-compose.yml)
+2. **Check .env file format** - no quotes around values:
+   ```env
+   SECRET_KEY=my_secret_key_here
+   TELEGRAM_BOT_TOKEN=1234567890:ABCdefGHI
+   ```
+3. **Restart Docker services**:
+   ```bash
+   docker-compose down
+   docker-compose up --build
+   ```
+
 ### Permission Issues
 If you get permission errors, try:
 ```bash
@@ -93,6 +109,11 @@ docker-compose up --build
 1. Wait 10-15 seconds for PostgreSQL to fully start
 2. Check database logs: `docker-compose logs postgres`
 3. Restart services: `docker-compose restart`
+
+### Network/DNS Issues
+If you see "Name or service not known" errors during build:
+1. See detailed solutions in [TROUBLESHOOTING.md](./TROUBLESHOOTING.md)
+2. Quick fix: Add DNS to docker-compose.yml (already configured with Google DNS 8.8.8.8)
 
 ## Development
 
