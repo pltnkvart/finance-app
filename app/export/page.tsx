@@ -6,8 +6,7 @@ export default function ExportPage() {
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-semibold text-foreground">Export Data</h1>
-          <p className="text-muted-foreground mt-1">Download your transaction data as CSV</p>
+          <h1 className="text-3xl font-semibold text-foreground">Экспорт данных</h1>
         </div>
 
         <ExportForm />

@@ -82,7 +82,7 @@ export function StatsOverview() {
             <div>
               <p className="text-sm font-medium text-muted-foreground">{card.title}</p>
               <h3 className="text-2xl font-semibold text-foreground mt-2">{card.value}</h3>
-              <div className="flex items-center gap-1 mt-2">
+              {/* <div className="flex items-center gap-1 mt-2">
                 {card.positive ? (
                   <ArrowUpRight className="h-4 w-4 text-green-500" />
                 ) : (
@@ -92,7 +92,7 @@ export function StatsOverview() {
                   {card.change}
                 </span>
                 <span className="text-sm text-muted-foreground">за месяц</span>
-              </div>
+              </div> */}
             </div>
             <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
               <card.icon className="h-6 w-6 text-primary" />
@@ -102,8 +102,4 @@ export function StatsOverview() {
       ))}
     </div>
   )
-}
-
-function cn(...classes: string[]) {
-  return classes.filter(Boolean).join(" ")
 }

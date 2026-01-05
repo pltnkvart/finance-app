@@ -36,7 +36,7 @@ export function TransactionList({ limit }: TransactionListProps) {
   if (loading) {
     return (
       <Card className="p-6">
-        <h2 className="text-lg font-semibold text-foreground mb-4">Recent Transactions</h2>
+        <h2 className="text-lg font-semibold text-foreground mb-4">Последние транзакции</h2>
         <div className="space-y-3">
           {[1, 2, 3, 4, 5].map((i) => (
             <div key={i} className="h-16 animate-pulse bg-muted rounded" />

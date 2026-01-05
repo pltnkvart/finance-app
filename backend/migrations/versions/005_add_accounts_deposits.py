@@ -23,7 +23,7 @@ def upgrade():
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('name', sa.String(length=100), nullable=False),
         sa.Column('description', sa.String(length=500), nullable=True),
-        sa.Column('account_type', sa.Enum('checking', 'savings', 'credit_card', 'cash', 'investment', name='accounttype'), nullable=False),
+        sa.Column('account_type', sa.Enum('CHECKING', 'SAVINGS', 'CREDIT_CARD', 'CASH', 'INVESTMENT', name='accounttype'), nullable=False),
         sa.Column('currency', sa.String(length=3), nullable=False),
         sa.Column('balance', sa.Numeric(precision=12, scale=2), nullable=False),
         sa.Column('created_at', sa.DateTime(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=True),
@@ -42,7 +42,7 @@ def upgrade():
         sa.Column('interest_rate', sa.Numeric(precision=5, scale=2), nullable=False),
         sa.Column('start_date', sa.Date(), nullable=False),
         sa.Column('end_date', sa.Date(), nullable=False),
-        sa.Column('status', sa.Enum('active', 'completed', 'cancelled', name='depositstatus'), nullable=False),
+        sa.Column('status', sa.Enum('ACTIVE', 'COMPLETED', 'CANCELLED', name='depositstatus'), nullable=False),
         sa.Column('created_at', sa.DateTime(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=True),
         sa.Column('updated_at', sa.DateTime(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=True),
         sa.PrimaryKeyConstraint('id'),
@@ -58,7 +58,7 @@ def upgrade():
     # Create default cash account
     op.execute("""
         INSERT INTO accounts (name, description, account_type, currency, balance)
-        VALUES ('Наличные', 'Основной счет для наличных денег', 'cash', 'RUB', 0.00);
+        VALUES ('Наличные', 'Основной счет для наличных денег', 'CASH', 'RUB', 0.00);
     """)
 
 

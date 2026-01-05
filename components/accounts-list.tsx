@@ -87,7 +87,7 @@ export function AccountsList() {
               </div>
               <div className="flex items-center gap-3">
                 <div className="text-right">
-                  <p className="text-lg font-bold text-foreground">₽{account.balance.toFixed(2)}</p>
+                  <p className="text-lg font-bold text-foreground">₽{Number(account.balance).toFixed(2)}</p>
                   <p className="text-xs text-muted-foreground">{account.currency}</p>
                 </div>
                 <div className="flex gap-1">

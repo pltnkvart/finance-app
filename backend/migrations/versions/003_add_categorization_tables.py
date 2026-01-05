@@ -16,7 +16,7 @@ depends_on = None
 
 
 def upgrade() -> None:
-    # Create categorization_rules table for storing learned patterns
+    # Create categorization_rules table
     op.create_table(
         'categorization_rules',
         sa.Column('id', sa.Integer(), nullable=False),
@@ -25,28 +25,61 @@ def upgrade() -> None:
         sa.Column('confidence', sa.Float(), nullable=False, server_default='0.0'),
         sa.Column('times_applied', sa.Integer(), nullable=False, server_default='0'),
         sa.Column('times_correct', sa.Integer(), nullable=False, server_default='0'),
-        sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
-        sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
-        sa.ForeignKeyConstraint(['category_id'], ['categories.id'], ),
+        sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()')),
+        sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()')),
+        sa.ForeignKeyConstraint(
+            ['category_id'],
+            ['categories.id'],
+            ondelete='CASCADE'
+        ),
         sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_categorization_rules_pattern'), 'categorization_rules', ['pattern'], unique=False)
-    op.create_index(op.f('ix_categorization_rules_category_id'), 'categorization_rules', ['category_id'], unique=False)
-    
-    # Create user_corrections table to track manual categorization changes
+
+    op.create_index(
+        op.f('ix_categorization_rules_pattern'),
+        'categorization_rules',
+        ['pattern']
+    )
+
+    op.create_index(
+        op.f('ix_categorization_rules_category_id'),
+        'categorization_rules',
+        ['category_id']
+    )
+
+    # Create user_corrections table
     op.create_table(
         'user_corrections',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('transaction_id', sa.Integer(), nullable=False),
         sa.Column('old_category_id', sa.Integer(), nullable=True),
         sa.Column('new_category_id', sa.Integer(), nullable=False),
-        sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
-        sa.ForeignKeyConstraint(['transaction_id'], ['transactions.id'], ),
-        sa.ForeignKeyConstraint(['old_category_id'], ['categories.id'], ),
-        sa.ForeignKeyConstraint(['new_category_id'], ['categories.id'], ),
+        sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()')),
+
+        sa.ForeignKeyConstraint(
+            ['transaction_id'],
+            ['transactions.id'],
+            ondelete='CASCADE'
+        ),
+        sa.ForeignKeyConstraint(
+            ['old_category_id'],
+            ['categories.id'],
+            ondelete='SET NULL'
+        ),
+        sa.ForeignKeyConstraint(
+            ['new_category_id'],
+            ['categories.id'],
+            ondelete='RESTRICT'
+        ),
+
         sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_user_corrections_transaction_id'), 'user_corrections', ['transaction_id'], unique=False)
+
+    op.create_index(
+        op.f('ix_user_corrections_transaction_id'),
+        'user_corrections',
+        ['transaction_id']
+    )
 
 
 def downgrade() -> None:
