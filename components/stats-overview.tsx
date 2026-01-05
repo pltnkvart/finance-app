@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react"
 import { Card } from "@/components/ui/card"
-import { ArrowUpRight, ArrowDownRight, Receipt, TrendingUp } from "lucide-react"
+import { ArrowUpRight, ArrowDownRight, Receipt, TrendingUp, Wallet } from "lucide-react"
 
 interface Stats {
   total_amount: number
   transaction_count: number
+  total_balance?: number
 }
 
 export function StatsOverview() {
@@ -25,25 +26,32 @@ export function StatsOverview() {
 
   const cards = [
     {
-      title: "Total Spent",
-      value: stats ? `$${stats.total_amount.toFixed(2)}` : "$0.00",
+      title: "Общий баланс",
+      value: stats?.total_balance ? `₽${stats.total_balance.toFixed(2)}` : "₽0.00",
+      icon: Wallet,
+      change: "+2.5%",
+      positive: true,
+    },
+    {
+      title: "Всего потрачено",
+      value: stats ? `₽${stats.total_amount.toFixed(2)}` : "₽0.00",
       icon: TrendingUp,
       change: "+12.5%",
       positive: false,
     },
     {
-      title: "Transactions",
+      title: "Транзакций",
       value: stats ? stats.transaction_count.toString() : "0",
       icon: Receipt,
       change: "+8",
       positive: true,
     },
     {
-      title: "Avg. Transaction",
+      title: "Средний расход",
       value:
         stats && stats.transaction_count > 0
-          ? `$${(stats.total_amount / stats.transaction_count).toFixed(2)}`
-          : "$0.00",
+          ? `₽${(stats.total_amount / stats.transaction_count).toFixed(2)}`
+          : "₽0.00",
       icon: ArrowUpRight,
       change: "+4.2%",
       positive: true,
@@ -52,8 +60,8 @@ export function StatsOverview() {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {[1, 2, 3].map((i) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[1, 2, 3, 4].map((i) => (
           <Card key={i} className="p-6">
             <div className="h-24 animate-pulse bg-muted rounded" />
           </Card>
@@ -63,7 +71,7 @@ export function StatsOverview() {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       {cards.map((card) => (
         <Card key={card.title} className="p-6">
           <div className="flex items-center justify-between">
@@ -79,7 +87,7 @@ export function StatsOverview() {
                 <span className={cn("text-sm font-medium", card.positive ? "text-green-500" : "text-red-500")}>
                   {card.change}
                 </span>
-                <span className="text-sm text-muted-foreground">vs last month</span>
+                <span className="text-sm text-muted-foreground">за месяц</span>
               </div>
             </div>
             <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">

@@ -81,7 +81,7 @@ export function TransactionList({ limit }: TransactionListProps) {
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-lg font-semibold text-foreground">${transaction.amount}</span>
+                <span className="text-lg font-semibold text-foreground">${transaction.amount.toFixed(2)}</span>
                 <div className="flex gap-1">
                   <Button variant="ghost" size="icon" className="h-8 w-8">
                     <Edit className="h-4 w-4" />

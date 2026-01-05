@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import Link from "next/link"
-import { Menu, X, LayoutDashboard, Receipt, PieChart, Download, Settings, Bot } from "lucide-react"
+import { Menu, X, LayoutDashboard, Receipt, PieChart, Download, Settings, Bot, Wallet } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -16,11 +16,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const navigation = [
-    { name: "Dashboard", href: "/", icon: LayoutDashboard },
-    { name: "Transactions", href: "/transactions", icon: Receipt },
-    { name: "Analytics", href: "/analytics", icon: PieChart },
-    { name: "Export", href: "/export", icon: Download },
-    { name: "Settings", href: "/settings", icon: Settings },
+    { name: "Главная", href: "/", icon: LayoutDashboard },
+    { name: "Транзакции", href: "/transactions", icon: Receipt },
+    { name: "Счета", href: "/accounts", icon: Wallet },
+    { name: "Аналитика", href: "/analytics", icon: PieChart },
+    { name: "Экспорт", href: "/export", icon: Download },
+    { name: "Настройки", href: "/settings", icon: Settings },
   ]
 
   return (
@@ -65,7 +66,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
           {/* Footer */}
           <div className="p-4 border-t border-border">
-            <div className="text-xs text-muted-foreground">Connected to Telegram</div>
+            <div className="text-xs text-muted-foreground">Подключено к Telegram</div>
           </div>
         </div>
       </aside>
@@ -80,7 +81,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
           <div className="flex items-center gap-4">
             <Button variant="outline" size="sm">
-              Last 30 days
+              Последние 30 дней
             </Button>
           </div>
         </header>

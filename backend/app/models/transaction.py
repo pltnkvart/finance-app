@@ -13,6 +13,8 @@ class Transaction(Base):
     description = Column(String(500), nullable=False)
     transaction_date = Column(DateTime, nullable=False)
     
+    account_id = Column(Integer, ForeignKey("accounts.id"), nullable=True)
+    
     # Foreign key to category
     category_id = Column(Integer, ForeignKey("categories.id"), nullable=True)
     
@@ -26,3 +28,4 @@ class Transaction(Base):
     
     # Relationships
     category = relationship("Category", back_populates="transactions")
+    account = relationship("Account", back_populates="transactions")

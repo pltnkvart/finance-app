@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
-from app.api import transactions, categories, statistics, telegram, export, categorization
+from app.api import transactions, categories, statistics, telegram, export, categorization, accounts, deposits
 from app.core.config import settings
 
 
@@ -37,6 +37,8 @@ app.include_router(statistics.router, prefix="/api/statistics", tags=["statistic
 app.include_router(telegram.router, prefix="/api/telegram", tags=["telegram"])
 app.include_router(export.router, prefix="/api/export", tags=["export"])
 app.include_router(categorization.router, prefix="/api/categorization", tags=["categorization"])
+app.include_router(accounts.router, prefix="/api/accounts", tags=["accounts"])
+app.include_router(deposits.router, prefix="/api/deposits", tags=["deposits"])
 
 
 @app.get("/")

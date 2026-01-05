@@ -23,12 +23,9 @@ services:
       dockerfile: Dockerfile.backend
     ports:
       - "8000:8000"
-    dns:
-      - 8.8.8.8
-      - 1.1.1.1
     environment:
       DATABASE_URL: postgresql://fintrack_user:fintrack_pass@postgres:5432/fintrack
-      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-7673643826:AAGdpWsm-FWqAOcYY4Gr0CqhZy0x1VTWPEo}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-your_bot_token_here}
       SECRET_KEY: ${SECRET_KEY:-dev_secret_key_change_in_production}
     depends_on:
       postgres:
@@ -41,12 +38,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.bot
-    dns:
-      - 8.8.8.8
-      - 1.1.1.1
     environment:
       DATABASE_URL: postgresql://fintrack_user:fintrack_pass@postgres:5432/fintrack
-      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-7673643826:AAGdpWsm-FWqAOcYY4Gr0CqhZy0x1VTWPEo}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-your_bot_token_here}
     depends_on:
       - postgres
       - backend

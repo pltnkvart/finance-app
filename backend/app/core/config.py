@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     TELEGRAM_BOT_TOKEN: str
     
     # Application
-    # SECRET_KEY: str
+    SECRET_KEY: str
     ENVIRONMENT: str = "development"
     
     # Categorization

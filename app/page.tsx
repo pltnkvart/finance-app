@@ -8,8 +8,8 @@ export default function HomePage() {
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-semibold text-foreground">Dashboard</h1>
-          <p className="text-muted-foreground mt-1">Track your expenses and manage your finances</p>
+          <h1 className="text-3xl font-semibold text-foreground">Главная</h1>
+          <p className="text-muted-foreground mt-1">Отслеживайте ваши расходы и управляйте финансами</p>
         </div>
 
         <StatsOverview />

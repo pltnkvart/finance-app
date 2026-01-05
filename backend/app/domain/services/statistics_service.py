@@ -2,9 +2,11 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from datetime import date
 from typing import Optional, Dict, Any
+from decimal import Decimal
 
 from app.models.transaction import Transaction
 from app.models.category import Category
+from app.models.account import Account
 
 
 class StatisticsService:
@@ -27,9 +29,12 @@ class StatisticsService:
         total = query.with_entities(func.sum(Transaction.amount)).scalar() or 0
         count = query.count()
         
+        total_balance = self.db.query(func.sum(Account.balance)).scalar() or 0
+        
         return {
             "total_amount": float(total),
             "transaction_count": count,
+            "total_balance": float(total_balance),
             "start_date": start_date,
             "end_date": end_date
         }
