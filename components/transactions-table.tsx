@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Edit, Trash2, Search } from "lucide-react"
 import { EditTransactionDialog } from "@/components/edit-transaction-dialog"
+import { api } from "@/lib/api"
 
 interface Transaction {
   id: number
@@ -32,10 +33,7 @@ export function TransactionsTable() {
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
 
   useEffect(() => {
-    Promise.all([
-      fetch("http://localhost:8000/api/transactions/").then((res) => res.json()),
-      fetch("http://localhost:8000/api/categories/").then((res) => res.json()),
-    ])
+    Promise.all([api.getTransactions(), api.getCategories()])
       .then(([transactionsData, categoriesData]) => {
         setTransactions(transactionsData)
         setCategories(categoriesData)
@@ -45,12 +43,10 @@ export function TransactionsTable() {
   }, [])
 
   const handleDelete = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this transaction?")) return
+    if (!confirm("Вы уверены, что хотите удалить эту транзакцию?")) return
 
     try {
-      await fetch(`http://localhost:8000/api/transactions/${id}`, {
-        method: "DELETE",
-      })
+      await api.deleteTransaction(id)
       setTransactions(transactions.filter((t) => t.id !== id))
     } catch (error) {
       console.error("Failed to delete transaction:", error)
@@ -82,7 +78,7 @@ export function TransactionsTable() {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search transactions..."
+              placeholder="Поиск транзакций..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-9"
@@ -90,10 +86,10 @@ export function TransactionsTable() {
           </div>
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
             <SelectTrigger className="w-full md:w-[200px]">
-              <SelectValue placeholder="All categories" />
+              <SelectValue placeholder="Все категории" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All categories</SelectItem>
+              <SelectItem value="all">Все категории</SelectItem>
               {categories.map((category) => (
                 <SelectItem key={category.id} value={category.name}>
                   {category.name}
@@ -107,8 +103,8 @@ export function TransactionsTable() {
           {filteredTransactions.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               {searchTerm || selectedCategory !== "all"
-                ? "No transactions match your filters"
-                : "No transactions yet. Start by sending a message to your Telegram bot!"}
+                ? "Нет транзакций, соответствующих фильтрам"
+                : "Транзакций пока нет. Начните отправлять сообщения в Telegram бот!"}
             </div>
           ) : (
             filteredTransactions.map((transaction) => (
@@ -119,10 +115,10 @@ export function TransactionsTable() {
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <p className="font-medium text-foreground">{transaction.description}</p>
-                    <Badge variant="secondary">{transaction.category_name || "Uncategorized"}</Badge>
+                    <Badge variant="secondary">{transaction.category_name || "Без категории"}</Badge>
                   </div>
                   <p className="text-sm text-muted-foreground mt-1">
-                    {new Date(transaction.transaction_date).toLocaleDateString("en-US", {
+                    {new Date(transaction.transaction_date).toLocaleDateString("ru-RU", {
                       year: "numeric",
                       month: "long",
                       day: "numeric",
@@ -132,7 +128,7 @@ export function TransactionsTable() {
                   </p>
                 </div>
                 <div className="flex items-center gap-4">
-                  <span className="text-lg font-semibold text-foreground">${transaction.amount.toFixed(2)}</span>
+                  <span className="text-lg font-semibold text-foreground">₽{transaction.amount.toFixed(2)}</span>
                   <div className="flex gap-1">
                     <Button
                       variant="ghost"

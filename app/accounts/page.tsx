@@ -8,14 +8,15 @@ import { Plus, Wallet, TrendingUp, PiggyBank } from "lucide-react"
 import { CreateAccountDialog } from "@/components/create-account-dialog"
 import { AccountsList } from "@/components/accounts-list"
 import { DepositsList } from "@/components/deposits-list"
+import { api } from "@/lib/api"
 
 export default function AccountsPage() {
   const [showCreateDialog, setShowCreateDialog] = useState(false)
   const [totalBalance, setTotalBalance] = useState(0)
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/statistics/summary")
-      .then((res) => res.json())
+    api
+      .getStatistics()
       .then((data) => setTotalBalance(data.total_balance || 0))
       .catch(() => {})
   }, [])

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Wallet, CreditCard, Banknote, TrendingUp, Edit, Trash2 } from "lucide-react"
+import { api } from "@/lib/api"
 
 interface Account {
   id: number
@@ -37,8 +38,8 @@ export function AccountsList() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/accounts")
-      .then((res) => res.json())
+    api
+      .getAccounts()
       .then((data) => {
         setAccounts(data)
         setLoading(false)

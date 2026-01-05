@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { Card } from "@/components/ui/card"
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts"
+import { api } from "@/lib/api"
 
 interface CategoryData {
   category: string
@@ -23,8 +24,8 @@ export function CategoryChart() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/statistics/by-category")
-      .then((res) => res.json())
+    api
+      .getCategoryStats()
       .then((categoryData) => {
         setData(categoryData)
         setLoading(false)
@@ -35,7 +36,7 @@ export function CategoryChart() {
   if (loading) {
     return (
       <Card className="p-6">
-        <h2 className="text-lg font-semibold text-foreground mb-4">Spending by Category</h2>
+        <h2 className="text-lg font-semibold text-foreground mb-4">Расходы по категориям</h2>
         <div className="h-64 animate-pulse bg-muted rounded" />
       </Card>
     )
@@ -44,8 +45,8 @@ export function CategoryChart() {
   if (data.length === 0) {
     return (
       <Card className="p-6">
-        <h2 className="text-lg font-semibold text-foreground mb-4">Spending by Category</h2>
-        <div className="h-64 flex items-center justify-center text-muted-foreground">No category data available</div>
+        <h2 className="text-lg font-semibold text-foreground mb-4">Расходы по категориям</h2>
+        <div className="h-64 flex items-center justify-center text-muted-foreground">Нет данных по категориям</div>
       </Card>
     )
   }
@@ -57,7 +58,7 @@ export function CategoryChart() {
 
   return (
     <Card className="p-6">
-      <h2 className="text-lg font-semibold text-foreground mb-4">Spending by Category</h2>
+      <h2 className="text-lg font-semibold text-foreground mb-4">Расходы по категориям</h2>
       <ResponsiveContainer width="100%" height={300}>
         <PieChart>
           <Pie
@@ -65,7 +66,7 @@ export function CategoryChart() {
             cx="50%"
             cy="50%"
             labelLine={false}
-            label={(entry) => `$${entry.value.toFixed(0)}`}
+            label={(entry) => `₽${entry.value.toFixed(0)}`}
             outerRadius={80}
             fill="#8884d8"
             dataKey="value"
@@ -75,7 +76,7 @@ export function CategoryChart() {
             ))}
           </Pie>
           <Tooltip
-            formatter={(value: number) => `$${value.toFixed(2)}`}
+            formatter={(value: number) => `₽${value.toFixed(2)}`}
             contentStyle={{
               backgroundColor: "hsl(var(--card))",
               border: "1px solid hsl(var(--border))",

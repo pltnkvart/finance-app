@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { Card } from "@/components/ui/card"
 import { ArrowUpRight, ArrowDownRight, Receipt, TrendingUp, Wallet } from "lucide-react"
+import { api } from "@/lib/api"
 
 interface Stats {
   total_amount: number
@@ -15,13 +16,16 @@ export function StatsOverview() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/statistics/summary")
-      .then((res) => res.json())
+    api
+      .getStatistics()
       .then((data) => {
         setStats(data)
         setLoading(false)
       })
-      .catch(() => setLoading(false))
+      .catch((error) => {
+        console.error("Failed to load statistics:", error)
+        setLoading(false)
+      })
   }, [])
 
   const cards = [

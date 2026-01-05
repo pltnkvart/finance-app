@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Edit, Trash2 } from "lucide-react"
+import { api } from "@/lib/api"
 
 interface Transaction {
   id: number
@@ -23,12 +24,8 @@ export function TransactionList({ limit }: TransactionListProps) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const url = limit
-      ? `http://localhost:8000/api/transactions/?limit=${limit}`
-      : "http://localhost:8000/api/transactions/"
-
-    fetch(url)
-      .then((res) => res.json())
+    api
+      .getTransactions(limit ? { limit } : undefined)
       .then((data) => {
         setTransactions(data)
         setLoading(false)
@@ -52,10 +49,10 @@ export function TransactionList({ limit }: TransactionListProps) {
   return (
     <Card className="p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-foreground">Recent Transactions</h2>
+        <h2 className="text-lg font-semibold text-foreground">Последние транзакции</h2>
         {limit && (
           <Button variant="ghost" size="sm">
-            View all
+            Показать все
           </Button>
         )}
       </div>
@@ -63,7 +60,7 @@ export function TransactionList({ limit }: TransactionListProps) {
       <div className="space-y-3">
         {transactions.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
-            No transactions yet. Start by sending a message to your Telegram bot!
+            Транзакций пока нет. Начните отправлять сообщения в Telegram бот!
           </div>
         ) : (
           transactions.map((transaction) => (
@@ -74,14 +71,14 @@ export function TransactionList({ limit }: TransactionListProps) {
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <p className="font-medium text-foreground">{transaction.description}</p>
-                  <Badge variant="secondary">{transaction.category_name || "Uncategorized"}</Badge>
+                  <Badge variant="secondary">{transaction.category_name || "Без категории"}</Badge>
                 </div>
                 <p className="text-sm text-muted-foreground mt-1">
                   {new Date(transaction.transaction_date).toLocaleDateString()}
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-lg font-semibold text-foreground">${transaction.amount.toFixed(2)}</span>
+                <span className="text-lg font-semibold text-foreground">₽{transaction.amount.toFixed(2)}</span>
                 <div className="flex gap-1">
                   <Button variant="ghost" size="icon" className="h-8 w-8">
                     <Edit className="h-4 w-4" />
