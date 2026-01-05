@@ -97,7 +97,7 @@ export function DepositsList() {
               </div>
             </div>
             <div className="text-right">
-              <p className="text-lg font-bold text-foreground">₽{deposit.amount.toFixed(2)}</p>
+              <p className="text-lg font-bold text-foreground">₽{deposit.amount}</p>
             </div>
           </div>
         </Card>

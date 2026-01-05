@@ -128,7 +128,7 @@ export function TransactionsTable() {
                   </p>
                 </div>
                 <div className="flex items-center gap-4">
-                  <span className="text-lg font-semibold text-foreground">₽{transaction.amount.toFixed(2)}</span>
+                  <span className="text-lg font-semibold text-foreground">₽{transaction.amount}</span>
                   <div className="flex gap-1">
                     <Button
                       variant="ghost"
