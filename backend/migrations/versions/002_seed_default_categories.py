@@ -28,16 +28,16 @@ def upgrade() -> None:
     op.bulk_insert(
         categories,
         [
-            {'name': 'Groceries', 'description': 'Food and household items'},
-            {'name': 'Transport', 'description': 'Public transport, taxi, fuel'},
-            {'name': 'Restaurants', 'description': 'Dining out, cafes, food delivery'},
-            {'name': 'Shopping', 'description': 'Clothing, electronics, general shopping'},
-            {'name': 'Entertainment', 'description': 'Movies, events, hobbies'},
-            {'name': 'Bills', 'description': 'Utilities, subscriptions, regular payments'},
-            {'name': 'Healthcare', 'description': 'Medical expenses, pharmacy'},
-            {'name': 'Education', 'description': 'Courses, books, learning materials'},
-            {'name': 'Travel', 'description': 'Vacation, trips, accommodation'},
-            {'name': 'Other', 'description': 'Uncategorized expenses'},
+            {'name': 'Продукты', 'description': 'Покупка продуктов и товаров для дома'},
+            {'name': 'Транспорт', 'description': 'Общественный транспорт, такси, топливо'},
+            {'name': 'Кафе и рестораны', 'description': 'Кафе, рестораны, доставка еды'},
+            {'name': 'Покупки', 'description': 'Одежда, электроника и другие покупки'},
+            {'name': 'Развлечения', 'description': 'Кино, мероприятия, хобби'},
+            {'name': 'Счета и подписки', 'description': 'Коммунальные услуги, подписки, регулярные платежи'},
+            {'name': 'Здоровье', 'description': 'Медицина, аптеки, лечение'},
+            {'name': 'Образование', 'description': 'Курсы, книги, обучение'},
+            {'name': 'Путешествия', 'description': 'Поездки, отпуск, проживание'},
+            {'name': 'Другое', 'description': 'Расходы без категории'},
         ]
     )
 
