@@ -4,9 +4,11 @@ import { useEffect, useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { PiggyBank, Plus } from "lucide-react"
+import { PiggyBank, Plus, Edit, Trash2 } from "lucide-react"
 import { CreateDepositDialog } from "@/components/create-deposit-dialog"
 import { api } from "@/lib/api"
+import { EditDepositDialog } from "@/components/edit-deposit-dialog"
+import { toast } from "@/hooks/use-toast"
 
 interface Deposit {
   id: number
@@ -37,6 +39,7 @@ export function DepositsList() {
   const [deposits, setDeposits] = useState<Deposit[]>([])
   const [loading, setLoading] = useState(true)
   const [showCreateDialog, setShowCreateDialog] = useState(false)
+  const [editingDeposit, setEditingDeposit] = useState<Deposit | null>(null)
 
   useEffect(() => {
     api
@@ -47,6 +50,31 @@ export function DepositsList() {
       })
       .catch(() => setLoading(false))
   }, [])
+
+  const handleDelete = async (deposit: Deposit) => {
+    if (!confirm(`Удалить вклад "${deposit.name}"?`)) {
+      return
+    }
+
+    try {
+      await api.deleteDeposit(deposit.id)
+      setDeposits(deposits.filter((item) => item.id !== deposit.id))
+      toast({
+        title: "Вклад удален",
+        description: deposit.name,
+      })
+    } catch (error) {
+      console.error("Не удалось удалить вклад:", error)
+      toast({
+        title: "Не удалось удалить вклад",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleUpdate = (updated: Deposit) => {
+    setDeposits(deposits.map((item) => (item.id === updated.id ? updated : item)))
+  }
 
   if (loading) {
     return (
@@ -98,6 +126,19 @@ export function DepositsList() {
             </div>
             <div className="text-right">
               <p className="text-lg font-bold text-foreground">₽{deposit.amount}</p>
+              <div className="flex justify-end gap-1 mt-2">
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditingDeposit(deposit)}>
+                  <Edit className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-destructive"
+                  onClick={() => handleDelete(deposit)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
         </Card>
@@ -107,6 +148,14 @@ export function DepositsList() {
         Добавить вклад
       </Button>
       <CreateDepositDialog open={showCreateDialog} onOpenChange={setShowCreateDialog} />
+
+      {editingDeposit && (
+        <EditDepositDialog
+          deposit={editingDeposit}
+          onClose={() => setEditingDeposit(null)}
+          onUpdate={() => handleUpdate}
+        />
+      )}
     </div>
   )
 }

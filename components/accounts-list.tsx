@@ -5,6 +5,8 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Wallet, CreditCard, Banknote, TrendingUp, Edit, Trash2 } from "lucide-react"
 import { api } from "@/lib/api"
+import { EditAccountDialog } from "@/components/edit-account-dialog"
+import { toast } from "@/hooks/use-toast"
 
 interface Account {
   id: number
@@ -36,6 +38,7 @@ const accountTypeLabels = {
 export function AccountsList() {
   const [accounts, setAccounts] = useState<Account[]>([])
   const [loading, setLoading] = useState(true)
+  const [editingAccount, setEditingAccount] = useState<Account | null>(null)
 
   useEffect(() => {
     api
@@ -46,6 +49,31 @@ export function AccountsList() {
       })
       .catch(() => setLoading(false))
   }, [])
+
+  const handleDelete = async (account: Account) => {
+    if (!confirm(`Удалить счет "${account.name}"?`)) {
+      return
+    }
+
+    try {
+      await api.deleteAccount(account.id)
+      setAccounts(accounts.filter((item) => item.id !== account.id))
+      toast({
+        title: "Счет удален",
+        description: account.name,
+      })
+    } catch (error) {
+      console.error("Не удалось удалить счет:", error)
+      toast({
+        title: "Не удалось удалить счет",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleUpdate = (updatedAccount: Account) => {
+    setAccounts(accounts.map((item) => (item.id === updatedAccount.id ? updatedAccount : item)))
+  }
 
   if (loading) {
     return (
@@ -91,10 +119,10 @@ export function AccountsList() {
                   <p className="text-xs text-muted-foreground">{account.currency}</p>
                 </div>
                 <div className="flex gap-1">
-                  <Button variant="ghost" size="icon">
+                  <Button variant="ghost" size="icon" onClick={() => setEditingAccount(account)}>
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="icon">
+                  <Button variant="ghost" size="icon" onClick={() => handleDelete(account)}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
@@ -103,6 +131,14 @@ export function AccountsList() {
           </Card>
         )
       })}
+
+      {editingAccount && (
+        <EditAccountDialog
+          account={editingAccount}
+          onClose={() => setEditingAccount(null)}
+          onUpdate={() => handleUpdate}
+        />
+      )}
     </div>
   )
 }

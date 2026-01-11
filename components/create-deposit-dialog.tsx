@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { api } from "@/lib/api"
+import { toast } from "@/hooks/use-toast"
 
 interface CreateDepositDialogProps {
   open: boolean
@@ -40,17 +41,28 @@ export function CreateDepositDialog({ open, onOpenChange }: CreateDepositDialogP
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    await api.createDeposit({
-      account_id: Number.parseInt(formData.account_id),
-      name: formData.name,
-      amount: Number.parseFloat(formData.amount),
-      interest_rate: Number.parseFloat(formData.interest_rate),
-      start_date: formData.start_date,
-      end_date: formData.end_date,
-    })
-
-    onOpenChange(false)
-    window.location.reload()
+    try {
+      const created = await api.createDeposit({
+        account_id: Number.parseInt(formData.account_id),
+        name: formData.name,
+        amount: Number.parseFloat(formData.amount),
+        interest_rate: Number.parseFloat(formData.interest_rate),
+        start_date: formData.start_date,
+        end_date: formData.end_date,
+      })
+      toast({
+        title: "Вклад создан",
+        description: created.name,
+      })
+      onOpenChange(false)
+      window.location.reload()
+    } catch (error) {
+      console.error("Ошибка создания вклада:", error)
+      toast({
+        title: "Не удалось создать вклад",
+        variant: "destructive",
+      })
+    }
   }
 
   return (

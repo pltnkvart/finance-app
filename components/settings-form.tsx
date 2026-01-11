@@ -1,72 +1,123 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import type React from "react"
+
+import { useEffect, useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { RefreshCw } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Trash2, Pencil, X } from "lucide-react"
 import { api } from "@/lib/api"
+import { toast } from "@/hooks/use-toast"
 
-interface CategorizationStats {
-  rule_based: {
-    total_rules: number
-    average_confidence: number
-  }
-  machine_learning: {
-    is_trained: boolean
-    num_categories: number
-    total_samples: number
-  }
-  user_corrections: number
-  threshold: number
+interface Category {
+  id: number
+  name: string
+  parent_id: number | null
+  parent_name?: string | null
+  description?: string | null
 }
 
 export function SettingsForm() {
-  const [stats, setStats] = useState<CategorizationStats | null>(null)
-  const [training, setTraining] = useState(false)
+  const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
+  const [editingId, setEditingId] = useState<number | null>(null)
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    parent_id: "none",
+  })
 
-  const loadStats = async () => {
+  const loadCategories = async () => {
     try {
-      const data = await api.getCategorizationStats()
-      setStats(data)
-      setLoading(false)
+      const data = await api.getCategories()
+      setCategories(data)
     } catch (error) {
-      console.error("Ошибка загрузки статистики:", error)
+      console.error("Ошибка загрузки категорий:", error)
+    } finally {
       setLoading(false)
     }
   }
 
   useEffect(() => {
-    loadStats()
+    loadCategories()
   }, [])
 
-  const handleTrain = async () => {
-    setTraining(true)
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault()
+
+    const payload = {
+      name: formData.name,
+      description: formData.description || null,
+      parent_id: formData.parent_id === "none" ? null : Number(formData.parent_id),
+    }
 
     try {
-      const result = await api.trainCategorization()
-
-      if (result.success) {
-        alert("Модель успешно обучена!")
-        loadStats()
+      if (editingId) {
+        const updated = await api.updateCategory(editingId, payload)
+        toast({
+          title: "Категория обновлена",
+          description: updated.name,
+        })
       } else {
-        alert(result.message)
+        const created = await api.createCategory(payload)
+        toast({
+          title: "Категория создана",
+          description: created.name,
+        })
       }
     } catch (error) {
-      console.error("Ошибка обучения:", error)
-      alert("Не удалось обучить модель")
-    } finally {
-      setTraining(false)
+      console.error("Ошибка сохранения категории:", error)
+      toast({
+        title: "Не удалось сохранить категорию",
+        variant: "destructive",
+      })
+      return
     }
+
+    setFormData({ name: "", description: "", parent_id: "none" })
+    setEditingId(null)
+    await loadCategories()
   }
 
-  if (loading) {
-    return (
-      <Card className="p-6">
-        <div className="h-64 animate-pulse bg-muted rounded" />
-      </Card>
-    )
+  const startEdit = (category: Category) => {
+    setEditingId(category.id)
+    setFormData({
+      name: category.name,
+      description: category.description ?? "",
+      parent_id: category.parent_id ? String(category.parent_id) : "none",
+    })
+  }
+
+  const cancelEdit = () => {
+    setEditingId(null)
+    setFormData({ name: "", description: "", parent_id: "none" })
+  }
+
+  const handleDelete = async (category: Category) => {
+    if (!confirm(`Удалить категорию "${category.name}"?`)) {
+      return
+    }
+
+    try {
+      await api.deleteCategory(category.id)
+      toast({
+        title: "Категория удалена",
+        description: category.name,
+      })
+      if (editingId === category.id) {
+        cancelEdit()
+      }
+      await loadCategories()
+    } catch (error) {
+      console.error("Ошибка удаления категории:", error)
+      toast({
+        title: "Не удалось удалить категорию",
+        variant: "destructive",
+      })
+    }
   }
 
   return (
@@ -74,64 +125,113 @@ export function SettingsForm() {
       <Card className="p-6">
         <div className="space-y-6">
           <div>
-            <h3 className="text-lg font-medium text-foreground mb-2">Движок категоризации</h3>
+            <h3 className="text-lg font-medium text-foreground mb-2">Категории и подкатегории</h3>
             <p className="text-sm text-muted-foreground">
-              Обучите модель машинного обучения для улучшения автоматической категоризации
+              Создавайте родительские категории и подкатегории вручную.
             </p>
           </div>
 
-          {stats && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-4 rounded-lg bg-muted/50">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm font-medium text-muted-foreground">Статус ML модели</p>
-                  <Badge variant={stats.machine_learning.is_trained ? "default" : "secondary"}>
-                    {stats.machine_learning.is_trained ? "Обучена" : "Не обучена"}
-                  </Badge>
-                </div>
-                <p className="text-2xl font-semibold text-foreground">
-                  {stats.machine_learning.num_categories} категорий
-                </p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {stats.machine_learning.total_samples} обучающих примеров
-                </p>
-              </div>
-
-              <div className="p-4 rounded-lg bg-muted/50">
-                <p className="text-sm font-medium text-muted-foreground mb-2">Система правил</p>
-                <p className="text-2xl font-semibold text-foreground">{stats.rule_based.total_rules} правил</p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {(stats.rule_based.average_confidence * 100).toFixed(0)}% средняя точность
-                </p>
-              </div>
-
-              <div className="p-4 rounded-lg bg-muted/50">
-                <p className="text-sm font-medium text-muted-foreground mb-2">Исправления пользователя</p>
-                <p className="text-2xl font-semibold text-foreground">{stats.user_corrections}</p>
-                <p className="text-sm text-muted-foreground mt-1">Учусь на ваших правках</p>
-              </div>
-
-              <div className="p-4 rounded-lg bg-muted/50">
-                <p className="text-sm font-medium text-muted-foreground mb-2">Порог схожести</p>
-                <p className="text-2xl font-semibold text-foreground">{(stats.threshold * 100).toFixed(0)}%</p>
-                <p className="text-sm text-muted-foreground mt-1">Минимальная требуемая уверенность</p>
-              </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="category-name">Название</Label>
+              <Input
+                id="category-name"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="Например: Развлечения"
+                required
+              />
             </div>
-          )}
 
-          <Button onClick={handleTrain} disabled={training}>
-            <RefreshCw className={`h-4 w-4 mr-2 ${training ? "animate-spin" : ""}`} />
-            {training ? "Обучение модели..." : "Обучить ML модель"}
-          </Button>
+            <div className="space-y-2">
+              <Label htmlFor="category-description">Описание</Label>
+              <Input
+                id="category-description"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Опционально"
+              />
+            </div>
 
-          <div className="p-4 bg-muted rounded-lg">
-            <h4 className="font-medium text-foreground mb-2">О процессе обучения</h4>
-            <ul className="text-sm text-muted-foreground space-y-1">
-              <li>• Требуется минимум 3 транзакции на категорию</li>
-              <li>• Использует TF-IDF векторизацию и косинусное сходство</li>
-              <li>• Учится на ваших ручных исправлениях категорий</li>
-              <li>• Переобучайте периодически для лучших результатов</li>
-            </ul>
+            <div className="space-y-2">
+              <Label>Родительская категория</Label>
+              <Select
+                value={formData.parent_id}
+                onValueChange={(value) => setFormData({ ...formData, parent_id: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Без родителя" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Без родителя</SelectItem>
+                  {categories
+                    .filter((category) => category.parent_id === null)
+                    .map((category) => (
+                      <SelectItem key={category.id} value={String(category.id)}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex justify-end">
+              {editingId ? (
+                <div className="flex gap-2">
+                  <Button type="button" variant="outline" onClick={cancelEdit}>
+                    <X className="h-4 w-4 mr-2" />
+                    Отмена
+                  </Button>
+                  <Button type="submit">Сохранить</Button>
+                </div>
+              ) : (
+                <Button type="submit">Добавить категорию</Button>
+              )}
+            </div>
+          </form>
+
+          <div className="space-y-2">
+            <h4 className="font-medium text-foreground">Существующие категории</h4>
+            {loading ? (
+              <div className="h-24 animate-pulse bg-muted rounded" />
+            ) : categories.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Категорий пока нет.</p>
+            ) : (
+              <div className="space-y-2">
+                {categories.map((category) => (
+                  <div key={category.id} className="flex items-center justify-between rounded-lg border border-border p-3">
+                    <div>
+                      <p className="font-medium text-foreground">{category.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {category.parent_name ? `Родитель: ${category.parent_name}` : "Родитель: нет"}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => startEdit(category)}
+                        title="Редактировать"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-destructive hover:text-destructive"
+                        onClick={() => handleDelete(category)}
+                        title="Удалить"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </Card>

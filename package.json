@@ -9,6 +9,9 @@
     "start": "next start"
   },
   "dependencies": {
+    "@gravity-ui/date-components": "^3.4.1",
+    "@gravity-ui/date-utils": "^2.6.0",
+    "@gravity-ui/uikit": "^7.29.0",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "1.2.2",
     "@radix-ui/react-alert-dialog": "1.1.4",

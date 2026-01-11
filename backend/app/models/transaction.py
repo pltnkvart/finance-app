@@ -1,17 +1,33 @@
-from sqlalchemy import Column, Integer, String, Numeric, DateTime, ForeignKey, Text
+from sqlalchemy import Column, Integer, String, Numeric, DateTime, ForeignKey, Text, Enum
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+import enum
 
 from app.core.database import Base
+
+
+class TransactionType(str, enum.Enum):
+    EXPENSE = "expense"
+    INCOME = "income"
 
 
 class Transaction(Base):
     __tablename__ = "transactions"
     
     id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True, index=True)
     amount = Column(Numeric(10, 2), nullable=False)
     description = Column(String(500), nullable=False)
     transaction_date = Column(DateTime, nullable=False)
+    transaction_type = Column(
+        Enum(
+            TransactionType,
+            values_callable=lambda enum_cls: [member.value for member in enum_cls],
+            name="transactiontype"
+        ),
+        nullable=False,
+        default=TransactionType.EXPENSE
+    )
     
     account_id = Column(Integer, ForeignKey("accounts.id"), nullable=True)
     
@@ -27,5 +43,6 @@ class Transaction(Base):
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
     
     # Relationships
+    user = relationship("User", back_populates="transactions")
     category = relationship("Category", back_populates="transactions")
     account = relationship("Account", back_populates="transactions")

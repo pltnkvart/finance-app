@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { Card } from "@/components/ui/card"
 import { TrendingUp } from "lucide-react"
 import { api } from "@/lib/api"
+import { useDateRange } from "@/components/date-range-context"
 
 interface CategoryData {
   category: string
@@ -14,17 +15,21 @@ interface CategoryData {
 export function TopCategories() {
   const [data, setData] = useState<CategoryData[]>([])
   const [loading, setLoading] = useState(true)
+  const { startDate, endDate } = useDateRange()
 
   useEffect(() => {
     api
-      .getCategoryStats()
+      .getCategoryStats({
+        ...(startDate ? { start_date: startDate } : {}),
+        ...(endDate ? { end_date: endDate } : {}),
+      })
       .then((categoryData) => {
         const sorted = categoryData.sort((a: CategoryData, b: CategoryData) => b.total - a.total)
         setData(sorted.slice(0, 5))
         setLoading(false)
       })
       .catch(() => setLoading(false))
-  }, [])
+  }, [startDate, endDate])
 
   if (loading) {
     return (

@@ -14,6 +14,7 @@ class ExportService:
     
     def export_to_csv(
         self,
+        user_id: int,
         start_date: Optional[date] = None,
         end_date: Optional[date] = None,
         category_id: Optional[int] = None
@@ -24,9 +25,12 @@ class ExportService:
             Transaction.id,
             Transaction.transaction_date,
             Transaction.amount,
+            Transaction.transaction_type,
             Transaction.description,
             Category.name.label("category")
-        ).outerjoin(Category, Transaction.category_id == Category.id)
+        ).outerjoin(Category, Transaction.category_id == Category.id).filter(
+            Transaction.user_id == user_id
+        )
         
         # Apply filters
         if start_date:
@@ -44,7 +48,7 @@ class ExportService:
         writer = csv.writer(output)
         
         # Write header
-        writer.writerow(["ID", "Date", "Amount", "Description", "Category"])
+        writer.writerow(["ID", "Date", "Amount", "Type", "Description", "Category"])
         
         # Write data
         for row in query.all():
@@ -52,6 +56,7 @@ class ExportService:
                 row.id,
                 row.transaction_date.strftime("%Y-%m-%d %H:%M:%S"),
                 float(row.amount),
+                row.transaction_type.value if row.transaction_type else "expense",
                 row.description,
                 row.category or "Uncategorized"
             ])

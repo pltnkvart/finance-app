@@ -7,11 +7,13 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Download } from "lucide-react"
 import { api } from "@/lib/api"
+import { useDateRange } from "@/components/date-range-context"
 
 export function ExportForm() {
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
   const [loading, setLoading] = useState(false)
+  const { range, startDate: rangeStart, endDate: rangeEnd } = useDateRange()
 
   const handleExport = async () => {
     setLoading(true)
@@ -38,6 +40,11 @@ export function ExportForm() {
     }
   }
 
+  const applyRange = () => {
+    setStartDate(rangeStart ?? "")
+    setEndDate(rangeEnd ?? "")
+  }
+
   return (
     <Card className="p-6 max-w-2xl">
       <div className="space-y-6">
@@ -60,15 +67,26 @@ export function ExportForm() {
           </div>
         </div>
 
-        <Button onClick={handleExport} disabled={loading} className="w-full md:w-auto">
-          <Download className="h-4 w-4 mr-2" />
-          {loading ? "Экспорт..." : "Экспортировать в CSV"}
-        </Button>
+        <div className="flex flex-col md:flex-row gap-3">
+          <Button onClick={handleExport} disabled={loading} className="w-full md:w-auto">
+            <Download className="h-4 w-4 mr-2" />
+            {loading ? "Экспорт..." : "Экспортировать в CSV"}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={applyRange}
+            disabled={range === "all"}
+            className="w-full md:w-auto"
+          >
+            Применить выбранный диапазон
+          </Button>
+        </div>
 
         <div className="p-4 bg-muted rounded-lg">
           <h4 className="font-medium text-foreground mb-2">Формат CSV</h4>
           <p className="text-sm text-muted-foreground">
-            Экспортированный файл будет содержать: ID, Дата, Сумма, Описание и Категория для каждой транзакции.
+            Экспортированный файл будет содержать: ID, Дата, Сумма, Тип, Описание и Категория.
           </p>
         </div>
       </div>

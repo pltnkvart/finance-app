@@ -5,15 +5,23 @@ from typing import Optional
 class CategoryBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
     description: Optional[str] = None
+    parent_id: Optional[int] = None
 
 
 class CategoryCreate(CategoryBase):
     pass
 
 
+class CategoryUpdate(BaseModel):
+    name: Optional[str] = Field(default=None, min_length=1, max_length=100)
+    description: Optional[str] = None
+    parent_id: Optional[int] = None
+
+
 class CategoryResponse(CategoryBase):
     id: int
     transaction_count: int = 0
+    parent_name: Optional[str] = None
     
     class Config:
         from_attributes = True

@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { api } from "@/lib/api"
+import { toast } from "@/hooks/use-toast"
 
 interface Transaction {
   id: number
@@ -17,6 +18,7 @@ interface Transaction {
   transaction_date: string
   category_id: number | null
   category_name: string | null
+  transaction_type: "expense" | "income"
 }
 
 interface Category {
@@ -35,6 +37,7 @@ export function EditTransactionDialog({ transaction, categories, onClose, onUpda
   const [amount, setAmount] = useState(transaction.amount.toString())
   const [description, setDescription] = useState(transaction.description)
   const [categoryId, setCategoryId] = useState<string>(transaction.category_id?.toString() || "")
+  const [transactionType, setTransactionType] = useState<"expense" | "income">(transaction.transaction_type)
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -46,12 +49,20 @@ export function EditTransactionDialog({ transaction, categories, onClose, onUpda
         amount: Number.parseFloat(amount),
         description,
         category_id: categoryId ? Number.parseInt(categoryId) : null,
+        transaction_type: transactionType,
+      })
+      toast({
+        title: "Транзакция обновлена",
+        description: updatedTransaction.description,
       })
       onUpdate(updatedTransaction)
       onClose()
     } catch (error) {
       console.error("Ошибка обновления транзакции:", error)
-      alert("Не удалось обновить транзакцию")
+      toast({
+        title: "Не удалось обновить транзакцию",
+        variant: "destructive",
+      })
     } finally {
       setLoading(false)
     }
@@ -95,6 +106,19 @@ export function EditTransactionDialog({ transaction, categories, onClose, onUpda
                     {category.name}
                   </SelectItem>
                 ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="transaction-type">Тип</Label>
+            <Select value={transactionType} onValueChange={(value) => setTransactionType(value as "expense" | "income")}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="expense">Расход</SelectItem>
+                <SelectItem value="income">Доход</SelectItem>
               </SelectContent>
             </Select>
           </div>

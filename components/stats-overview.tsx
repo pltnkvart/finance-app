@@ -4,61 +4,103 @@ import { useEffect, useState } from "react"
 import { Card } from "@/components/ui/card"
 import { ArrowUpRight, ArrowDownRight, Receipt, TrendingUp, Wallet } from "lucide-react"
 import { api } from "@/lib/api"
+import { useDateRange } from "@/components/date-range-context"
 
 interface Stats {
   total_amount: number
   transaction_count: number
   total_balance?: number
+  income_total?: number
+  expense_total?: number
 }
 
 export function StatsOverview() {
   const [stats, setStats] = useState<Stats | null>(null)
+  const [baselineStats, setBaselineStats] = useState<Stats | null>(null)
   const [loading, setLoading] = useState(true)
+  const { range, startDate, endDate } = useDateRange()
 
   useEffect(() => {
-    api
-      .getStatistics()
-      .then((data) => {
-        setStats(data)
-        setLoading(false)
-      })
-      .catch((error) => {
+    const loadStats = async () => {
+      try {
+        if (range !== "all" && startDate && endDate) {
+          const [current, baseline] = await Promise.all([
+            api.getStatistics({ start_date: startDate, end_date: endDate }),
+            api.getStatistics({ start_date: startDate, end_date: startDate }),
+          ])
+          setStats(current)
+          setBaselineStats(baseline)
+        } else if (range === "all") {
+          const current = await api.getStatistics()
+          setStats(current)
+          setBaselineStats(null)
+        } else {
+          setStats(null)
+          setBaselineStats(null)
+        }
+      } catch (error) {
         console.error("Failed to load statistics:", error)
+      } finally {
         setLoading(false)
-      })
-  }, [])
+      }
+    }
+
+    loadStats()
+  }, [range, startDate, endDate])
+
+  const buildDelta = (current?: number, baseline?: number) => {
+    if (baseline === undefined || baseline === null || current === undefined || current === null) {
+      return null
+    }
+    if (baseline === 0) {
+      if (current === 0) {
+        return { text: "—", tone: "neutral" as const }
+      }
+      return null
+    }
+
+    const delta = ((current - baseline) / Math.abs(baseline)) * 100
+    const sign = delta >= 0 ? "+" : ""
+    return {
+      text: `${sign}${delta.toFixed(1)}% к концу периода`,
+      tone: delta >= 0 ? "positive" as const : "negative" as const,
+    }
+  }
+
+  const expenseTotal = stats ? stats.expense_total ?? stats.total_amount : 0
+  const incomeTotal = stats ? stats.income_total ?? 0 : 0
+  const netFlow = incomeTotal - expenseTotal
+
+  const baselineExpense = baselineStats ? baselineStats.expense_total ?? baselineStats.total_amount : undefined
+  const baselineIncome = baselineStats ? baselineStats.income_total ?? 0 : undefined
+  const baselineNet = baselineStats
+    ? (baselineStats.income_total ?? 0) - (baselineStats.expense_total ?? baselineStats.total_amount)
+    : undefined
 
   const cards = [
     {
       title: "Общий баланс",
       value: stats?.total_balance ? `₽${stats.total_balance.toFixed(2)}` : "₽0.00",
       icon: Wallet,
-      change: "+2.5%",
-      positive: true,
+      delta: null,
     },
     {
       title: "Всего потрачено",
-      value: stats ? `₽${stats.total_amount.toFixed(2)}` : "₽0.00",
+      value: stats ? `₽${expenseTotal.toFixed(2)}` : "₽0.00",
       icon: TrendingUp,
-      change: "+12.5%",
-      positive: false,
+      delta: buildDelta(expenseTotal, baselineExpense),
     },
     {
-      title: "Транзакций",
-      value: stats ? stats.transaction_count.toString() : "0",
-      icon: Receipt,
-      change: "+8",
-      positive: true,
+      title: "Доходы",
+      value: stats ? `₽${incomeTotal.toFixed(2)}` : "₽0.00",
+      icon: ArrowDownRight,
+      delta: buildDelta(incomeTotal, baselineIncome),
     },
     {
-      title: "Средний расход",
-      value:
-        stats && stats.transaction_count > 0
-          ? `₽${(stats.total_amount / stats.transaction_count).toFixed(2)}`
-          : "₽0.00",
+      title: "Чистый доход",
+      value: stats ? `₽${netFlow.toFixed(2)}` : "₽0.00",
       icon: ArrowUpRight,
-      change: "+4.2%",
-      positive: true,
+      delta: buildDelta(netFlow, baselineNet),
     },
   ]
 
@@ -82,17 +124,26 @@ export function StatsOverview() {
             <div>
               <p className="text-sm font-medium text-muted-foreground">{card.title}</p>
               <h3 className="text-2xl font-semibold text-foreground mt-2">{card.value}</h3>
-              {/* <div className="flex items-center gap-1 mt-2">
-                {card.positive ? (
-                  <ArrowUpRight className="h-4 w-4 text-green-500" />
-                ) : (
-                  <ArrowDownRight className="h-4 w-4 text-red-500" />
-                )}
-                <span className={cn("text-sm font-medium", card.positive ? "text-green-500" : "text-red-500")}>
-                  {card.change}
-                </span>
-                <span className="text-sm text-muted-foreground">за месяц</span>
-              </div> */}
+              {card.delta ? (
+                <div className="flex items-center gap-1 mt-2">
+                  {card.delta.tone === "positive" ? (
+                    <ArrowUpRight className="h-4 w-4 text-emerald-600" />
+                  ) : card.delta.tone === "negative" ? (
+                    <ArrowDownRight className="h-4 w-4 text-rose-500" />
+                  ) : null}
+                  <span
+                    className={`text-sm font-medium ${
+                      card.delta.tone === "positive"
+                        ? "text-emerald-600"
+                        : card.delta.tone === "negative"
+                          ? "text-rose-500"
+                          : "text-muted-foreground"
+                    }`}
+                  >
+                    {card.delta.text}
+                  </span>
+                </div>
+              ) : null}
             </div>
             <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
               <card.icon className="h-6 w-6 text-primary" />

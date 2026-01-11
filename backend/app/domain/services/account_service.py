@@ -10,17 +10,18 @@ class AccountService:
     def __init__(self, db: Session):
         self.db = db
     
-    def get_accounts(self, skip: int = 0, limit: int = 100) -> List[Account]:
+    def get_accounts(self, user_id: int, skip: int = 0, limit: int = 100) -> List[Account]:
         """Получить список счетов"""
-        return self.db.query(Account).offset(skip).limit(limit).all()
+        return self.db.query(Account).filter(Account.user_id == user_id).offset(skip).limit(limit).all()
     
-    def get_account(self, account_id: int) -> Optional[Account]:
+    def get_account(self, account_id: int, user_id: int) -> Optional[Account]:
         """Получить счет по ID"""
-        return self.db.query(Account).filter(Account.id == account_id).first()
+        return self.db.query(Account).filter(Account.id == account_id, Account.user_id == user_id).first()
     
-    def create_account(self, account_data: AccountCreate) -> Account:
+    def create_account(self, user_id: int, account_data: AccountCreate) -> Account:
         """Создать новый счет"""
         account = Account(
+            user_id=user_id,
             name=account_data.name,
             description=account_data.description,
             account_type=account_data.account_type,
@@ -32,9 +33,9 @@ class AccountService:
         self.db.refresh(account)
         return account
     
-    def update_account(self, account_id: int, account_data: AccountUpdate) -> Optional[Account]:
+    def update_account(self, account_id: int, user_id: int, account_data: AccountUpdate) -> Optional[Account]:
         """Обновить счет"""
-        account = self.get_account(account_id)
+        account = self.get_account(account_id, user_id)
         if not account:
             return None
         
@@ -46,9 +47,9 @@ class AccountService:
         self.db.refresh(account)
         return account
     
-    def delete_account(self, account_id: int) -> bool:
+    def delete_account(self, account_id: int, user_id: int) -> bool:
         """Удалить счет"""
-        account = self.get_account(account_id)
+        account = self.get_account(account_id, user_id)
         if not account:
             return False
         
@@ -56,8 +57,8 @@ class AccountService:
         self.db.commit()
         return True
     
-    def get_total_balance(self) -> Decimal:
+    def get_total_balance(self, user_id: int) -> Decimal:
         """Рассчитать общий баланс по всем счетам"""
         from sqlalchemy import func
-        result = self.db.query(func.sum(Account.balance)).scalar()
+        result = self.db.query(func.sum(Account.balance)).filter(Account.user_id == user_id).scalar()
         return Decimal(result) if result else Decimal("0.00")

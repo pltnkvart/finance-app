@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Edit, Trash2, Search } from "lucide-react"
 import { EditTransactionDialog } from "@/components/edit-transaction-dialog"
 import { api } from "@/lib/api"
+import { useDateRange } from "@/components/date-range-context"
 
 interface Transaction {
   id: number
@@ -17,6 +18,7 @@ interface Transaction {
   transaction_date: string
   category_id: number | null
   category_name: string | null
+  transaction_type: "expense" | "income"
 }
 
 interface Category {
@@ -31,16 +33,22 @@ export function TransactionsTable() {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
+  const { startDate, endDate } = useDateRange()
 
   useEffect(() => {
-    Promise.all([api.getTransactions(), api.getCategories()])
+    const params = {
+      ...(startDate ? { start_date: startDate } : {}),
+      ...(endDate ? { end_date: endDate } : {}),
+    }
+
+    Promise.all([api.getTransactions(params), api.getCategories()])
       .then(([transactionsData, categoriesData]) => {
         setTransactions(transactionsData)
         setCategories(categoriesData)
         setLoading(false)
       })
       .catch(() => setLoading(false))
-  }, [])
+  }, [startDate, endDate])
 
   const handleDelete = async (id: number) => {
     if (!confirm("Вы уверены, что хотите удалить эту транзакцию?")) return
@@ -128,7 +136,13 @@ export function TransactionsTable() {
                   </p>
                 </div>
                 <div className="flex items-center gap-4">
-                  <span className="text-lg font-semibold text-foreground">₽{transaction.amount}</span>
+                  <span
+                    className={`text-lg font-semibold ${
+                      transaction.transaction_type === "income" ? "text-emerald-600" : "text-foreground"
+                    }`}
+                  >
+                    {transaction.transaction_type === "income" ? "+" : "-"}₽{transaction.amount}
+                  </span>
                   <div className="flex gap-1">
                     <Button
                       variant="ghost"

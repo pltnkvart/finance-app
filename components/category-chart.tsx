@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { Card } from "@/components/ui/card"
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts"
 import { api } from "@/lib/api"
+import { useDateRange } from "@/components/date-range-context"
 
 interface CategoryData {
   category: string
@@ -12,26 +13,30 @@ interface CategoryData {
 }
 
 const COLORS = [
-  "hsl(var(--chart-1))",
-  "hsl(var(--chart-2))",
-  "hsl(var(--chart-3))",
-  "hsl(var(--chart-4))",
-  "hsl(var(--chart-5))",
+  "var(--chart-1)",
+  "var(--chart-2)",
+  "var(--chart-3)",
+  "var(--chart-4)",
+  "var(--chart-5)",
 ]
 
 export function CategoryChart() {
   const [data, setData] = useState<CategoryData[]>([])
   const [loading, setLoading] = useState(true)
+  const { startDate, endDate } = useDateRange()
 
   useEffect(() => {
     api
-      .getCategoryStats()
+      .getCategoryStats({
+        ...(startDate ? { start_date: startDate } : {}),
+        ...(endDate ? { end_date: endDate } : {}),
+      })
       .then((categoryData) => {
         setData(categoryData)
         setLoading(false)
       })
       .catch(() => setLoading(false))
-  }, [])
+  }, [startDate, endDate])
 
   if (loading) {
     return (
